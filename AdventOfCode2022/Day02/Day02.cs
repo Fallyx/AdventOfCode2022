@@ -2,7 +2,7 @@
 internal class Day02
 {
     const string inputPath = @"Day02/Input.txt";
-    private static Dictionary<string, int> outcomesPart2 = new Dictionary<string, int>()
+    private static Dictionary<string, int> outcomes = new Dictionary<string, int>()
     {
         { "AX", 3 }, { "AY", 1 + 3 }, { "AZ", 2 + 6 }, { "BX", 1 }, { "BY", 2 + 3 }, { "BZ", 3 + 6 }, { "CX", 2 }, { "CY", 3 + 3 }, { "CZ", 1 + 6 }
     };
@@ -12,7 +12,6 @@ internal class Day02
         List<String> lines = File.ReadAllLines(inputPath).ToList();
         int pointsTask1 = 0;
         int pointsTask2 = 0;
-        int pointsTask3 = 0;
 
         foreach (String line in lines)
         {
@@ -24,7 +23,6 @@ internal class Day02
 
         Console.WriteLine($"Task 1: {pointsTask1}");
         Console.WriteLine($"Task 2: {pointsTask2}");
-        Console.WriteLine($"Task 2: {pointsTask3}");
     }
 
     private static int PlayTask1(string rpc)
@@ -42,6 +40,6 @@ internal class Day02
 
     private static int PlayTask2(string rpc)
     {
-        return outcomesPart2[rpc];
+        return outcomes[rpc];
     }
 }
