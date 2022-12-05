@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace AdventOfCode2022.Day05;
+﻿namespace AdventOfCode2022.Day05;
 internal class Day05
 {
     const string inputPath = @"Day05/Input.txt";
@@ -42,25 +40,23 @@ internal class Day05
 
     private static void ParseCargos(string line)
     {
-        MatchCollection cargoLines = Regex.Matches(line, @"(\s{3}|\[[A-Z]\])\s?");
-        int i = 0;
-
-        foreach(Match match in cargoLines) 
+        for (int i = 0; i * 4 + 1 < line.Length; i++)
         {
-            i++;
-            if (match.Value.Trim().Length == 0) continue;
+            int charIdx = i * 4 + 1;
+            if (line[charIdx] == ' ') continue;
 
-            supplyStacksTask1.TryAdd(i, new Stack<char>());
-            supplyStacksTask1[i].Push(match.Value[1]);
+            supplyStacksTask1.TryAdd(i + 1, new Stack<char>());
+            supplyStacksTask1[i + 1].Push(line[charIdx]);
 
-            supplyStacksTask2.TryAdd(i, new Stack<char>());
-            supplyStacksTask2[i].Push(match.Value[1]);
+            supplyStacksTask2.TryAdd(i + 1, new Stack<char>());
+            supplyStacksTask2[i + 1].Push(line[charIdx]);
         }
     }
 
     private static void MoveCargos(string line)
     {
-        int[] operations = Regex.Split(line, @"\D+").Where(s => !string.IsNullOrWhiteSpace(s)).Select(int.Parse).ToArray();
+        int[] operations = line.Split(' ').Where((item, index) => index % 2 != 0).Select(int.Parse).ToArray();
+
         Stack<char> tmp = new Stack<char>();
 
         for (int i = 0; i < operations[0]; i++)
