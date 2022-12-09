@@ -10,6 +10,7 @@ internal class Day09
         Console.WriteLine($"Task 1: {Ropes(2)}");
         Console.WriteLine($"Task 2: {Ropes(10)}");
     }
+
     private static int Ropes(int ropeLength)
     {
         HashSet<Vector2> visitedTail = new HashSet<Vector2> { new Vector2() };
@@ -58,8 +59,8 @@ internal class Day09
         if (xDisteance <= 1 && xDisteance >= -1 && yDistance <= 1 && yDistance >= -1)
             return move;
 
-        move.X = Math.Clamp(head.X - tail.X, -1, 1);
-        move.Y = Math.Clamp(head.Y - tail.Y, -1, 1);
+        move.X = Math.Clamp(xDisteance, -1, 1);
+        move.Y = Math.Clamp(yDistance, -1, 1);
 
         return move;
     }
