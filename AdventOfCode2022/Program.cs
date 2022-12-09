@@ -17,7 +17,7 @@ class Program
         {
             Console.WriteLine("Run a day [1-25]:");
             input = Console.ReadLine();
-            Console.WriteLine("-----------------\n");
+            Console.WriteLine("-----------------");
         }
 
         bool success = int.TryParse(input, out int day);
@@ -59,6 +59,9 @@ class Program
                 break;
             case 8:
                 Day08.Day08.Task1();
+                break;
+            case 9:
+                Day09.Day09.Task1and2();
                 break;
             default:
                 break;

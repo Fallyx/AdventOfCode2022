@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Security.Cryptography.X509Certificates;
-
-namespace AdventOfCode2022.Day08;
+﻿namespace AdventOfCode2022.Day08;
 
 internal class Day08
 {
