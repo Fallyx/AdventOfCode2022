@@ -24,7 +24,7 @@ internal class Day10
             if ( (X - 1) <= pixel && pixel <= (X + 1) )
                 Console.Write("#");
             else
-                Console.Write(".");
+                Console.Write(" ");
 
             if (i % 40 == 0)
                 Console.WriteLine();

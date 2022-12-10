@@ -3,14 +3,13 @@
 internal class Day08
 {
     const string inputPath = @"Day08/Input.txt";
-    private static int[,] forest;
 
     public static void Task1()
     {
         List<String> lines = File.ReadAllLines(inputPath).ToList();
         int countVisible = 0;
 
-        forest = new int[lines[0].Length, lines.Count];
+        int[,] forest = new int[lines[0].Length, lines.Count];
 
         for (int y = 0; y < lines.Count; y++)
         {
@@ -23,12 +22,12 @@ internal class Day08
             }
         }
 
-        (int countVisibility, int maxScenicScore) result = CalculateVisibilityAndMaxScenicScore();
+        (int countVisibility, int maxScenicScore) result = CalculateVisibilityAndMaxScenicScore(forest);
         Console.WriteLine($"Task 1: {result.countVisibility + countVisible}");
         Console.WriteLine($"Task 2: {result.maxScenicScore}");
     }
 
-    private static (int countVisibility, int maxScenicScore) CalculateVisibilityAndMaxScenicScore()
+    private static (int countVisibility, int maxScenicScore) CalculateVisibilityAndMaxScenicScore(int[,] forest)
     {
         int countVisibility = 0;
         int maxScenicScore = 0;
@@ -38,8 +37,8 @@ internal class Day08
             for (int x = 1; x < forest.GetLength(0) - 1; x++)
             {
                 int currentHeight = forest[x, y];
-                int[] rows = GetRow(y);
-                int[] cols = GetColumn(x);
+                int[] rows = GetRow(forest, y);
+                int[] cols = GetColumn(forest, x);
 
                 if (rows.Take(x).All(r => r < currentHeight)
                     || rows.Skip(x + 1).All(r => r < currentHeight)
@@ -60,13 +59,13 @@ internal class Day08
         return (countVisibility, maxScenicScore);
     }
 
-    private static int[] GetRow(int y)
+    private static int[] GetRow(int[,] forest, int y)
     {
         return Enumerable.Range(0, forest.GetLength(0))
             .Select(f => forest[f, y]).ToArray();
     }
 
-    private static int[] GetColumn(int x)
+    private static int[] GetColumn(int[,] forest, int x)
     {
         return Enumerable.Range(0, forest.GetLength(1))
             .Select(f => forest[x, f]).ToArray();

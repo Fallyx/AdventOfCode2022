@@ -13,6 +13,13 @@ internal class Day09
 
     private static int Ropes(int ropeLength)
     {
+        Dictionary<String, Vector2> moveDirections = new Dictionary<string, Vector2>()
+        {
+            { "U", new Vector2(0, 1) },
+            { "D", new Vector2(0, -1) },
+            { "L", new Vector2(-1, 0) },
+            { "R", new Vector2(1, 0) }
+        };
         HashSet<Vector2> visitedTail = new HashSet<Vector2> { new Vector2() };
         Vector2[] ropes = new Vector2[ropeLength];
 
@@ -21,19 +28,9 @@ internal class Day09
         foreach (String line in lines)
         {
             string[] move = line.Split(' ');
-            Vector2 moveDirection = new Vector2();
-
-            if (move[0] == "U")
-                moveDirection = new Vector2(0, 1);
-            else if (move[0] == "D")
-                moveDirection = new Vector2(0, -1);
-            else if (move[0] == "L")
-                moveDirection = new Vector2(-1, 0);
-            else if (move[0] == "R")
-                moveDirection = new Vector2(1, 0);
-
+            Vector2 moveDirection = moveDirections[move[0]];
             int steps = int.Parse(move[1]);
-
+            
             for(int i = 0; i < steps; i++)
             {
                 ropes[0] += moveDirection;
