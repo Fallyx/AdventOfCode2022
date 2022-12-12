@@ -3,13 +3,13 @@ namespace AdventOfCode2022.Day11;
 internal class Day11
 {
     const string inputPath = @"Day11/Input.txt";
-    public static void Task1()
+    public static void Task1and2()
     {
         List<String> lines = File.ReadAllLines(inputPath).ToList();
         List<Monkey> monkeysTask1 = new List<Monkey>();
         List<Monkey> monkeysTask2 = new List<Monkey>();
 
-        for (int i = 0; i < lines.Count(); i += 7)
+        for (int i = 0; i < lines.Count; i += 7)
         {
             monkeysTask1.Add(ParseLines(lines.Skip(i).Take(6).ToList()));
             monkeysTask2.Add(ParseLines(lines.Skip(i).Take(6).ToList()));
