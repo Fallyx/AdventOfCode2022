@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace AdventOfCode2022.Day12;
 
 internal class Day12
@@ -44,15 +42,14 @@ internal class Day12
             }
         }
 
-        nodes[start].DistanceFromStart = 0;
-        Console.WriteLine($"Task 1: {ShortestPath(nodes, start, target, lines[0].Length, lines.Count)}");
-
         int shortestPathTask2 = int.MaxValue;
         foreach((int x, int y) in aElevation)
         {
             ResetDistance(nodes);
             nodes[(x, y)].DistanceFromStart = 0;
             shortestPathTask2 = Math.Min(shortestPathTask2, ShortestPath((nodes), (x, y), target, lines[0].Length, lines.Count));
+            if (x == start.x && y == start.y)
+                Console.WriteLine($"Task 1: {nodes[target].DistanceFromStart}");
         }
 
         Console.WriteLine($"Task 2: {shortestPathTask2}");
@@ -81,7 +78,6 @@ internal class Day12
                 if (currentNode.Height + 1 < nextNode.Height) continue;
 
                 int distanceToNext = currentNode.DistanceFromStart + 1;
-
                 if (nextNode.DistanceFromStart > distanceToNext)
                 {
                     nextNode.DistanceFromStart = distanceToNext;
