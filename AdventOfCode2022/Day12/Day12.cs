@@ -60,10 +60,8 @@ internal class Day12
 
     private static int ShortestPath(Dictionary<(int x, int y), ElevationNode> nodes, (int x, int y) start, (int x, int y) target, int maxX, int maxY)
     {
-        PriorityQueue<ElevationNode, int> queue = new PriorityQueue<ElevationNode, int>();
-        HashSet<ElevationNode> visited = new HashSet<ElevationNode>();
-        queue.Enqueue(nodes[start], nodes[start].DistanceFromStart);
-        visited.Add(nodes[start]);
+        Queue<ElevationNode> queue = new Queue<ElevationNode>();
+        queue.Enqueue(nodes[start]);
 
         while (queue.Count > 0)
         {
@@ -86,10 +84,8 @@ internal class Day12
 
                 if (nextNode.DistanceFromStart > distanceToNext)
                 {
-                    if (visited.Contains(nextNode)) visited.Remove(nextNode);
-
                     nextNode.DistanceFromStart = distanceToNext;
-                    queue.Enqueue(nextNode, distanceToNext);
+                    queue.Enqueue(nextNode);
                 }
             }
         }
