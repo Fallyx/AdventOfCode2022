@@ -4,7 +4,7 @@ internal class Day08
 {
     const string inputPath = @"Day08/Input.txt";
 
-    public static void Task1()
+    public static void Task1and2()
     {
         List<String> lines = File.ReadAllLines(inputPath).ToList();
         int countVisible = 0;

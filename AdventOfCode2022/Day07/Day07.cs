@@ -17,9 +17,9 @@ internal class Day07
             {
                 string dir = line.Split(' ')[2];
                 if (dir == "..")
-                    currentParent = currentParent.Parent;
+                    currentParent = currentParent!.Parent!;
                 else
-                    currentParent = currentParent.Childs.Find(f => f.Name == dir);
+                    currentParent = currentParent!.Childs!.Find(f => f.Name == dir)!;
             }
             else if (line.StartsWith("$ ls")) continue;
             else if (line.StartsWith("dir"))

@@ -58,7 +58,7 @@ class Program
                 Day07.Day07.Task1and2();
                 break;
             case 8:
-                Day08.Day08.Task1();
+                Day08.Day08.Task1and2();
                 break;
             case 9:
                 Day09.Day09.Task1and2();
@@ -71,6 +71,9 @@ class Program
                 break;
             case 12:
                 Day12.Day12.Task1and2();
+                break;
+            case 13:
+                Day13.Day13.Task1();
                 break;
             default:
                 break;
