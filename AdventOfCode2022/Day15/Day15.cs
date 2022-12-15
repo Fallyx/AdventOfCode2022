@@ -46,7 +46,7 @@ internal class Day15
             foreach (KeyValuePair<Vector2, int> sensor in sensors)
             {
                 int d2 = ManhattanDistance(sensor.Key, currentPos);
-                if (d2 <= sensor.Value)
+                if (d2 <= sensor.Value && !beacons.Contains(currentPos))
                 {
                     countNoBeacon++;
                     break;
@@ -54,44 +54,31 @@ internal class Day15
             }
         }
 
-        Console.WriteLine($"Task 1: {countNoBeacon - beacons.Where(b => b.Y == yLine).Count()}");
+        Console.WriteLine($"Task 1: {countNoBeacon}");
+        yLine *= 2;
 
-        HashSet<Vector2> possibleBeaconPos = new HashSet<Vector2>();
         foreach (KeyValuePair<Vector2, int> sensor in sensors)
         {
             int ringMinY = Math.Max(0, (int) sensor.Key.Y - sensor.Value - 1);
-            int ringMaxY = Math.Min(yLine * 2, (int) sensor.Key.Y + sensor.Value + 1);
+            int ringMaxY = Math.Min(yLine, (int) sensor.Key.Y + sensor.Value + 1);
 
             for(int y = ringMinY; y <= ringMaxY; y++)
             {
-                int ringXLeft = (int) sensor.Key.X + Math.Abs((int) sensor.Key.Y - y) - sensor.Value - 1;
-                ringXLeft = Math.Max(0, ringXLeft);
-                int ringXRight = (int) sensor.Key.X + ((int) sensor.Key.X - ringXLeft);
-                ringXRight = Math.Min(yLine * 2, ringXRight);
-                possibleBeaconPos.Add(new Vector2(ringXLeft, y));
-                possibleBeaconPos.Add(new Vector2(ringXRight, y));
-            }
-        }
+                int xLeft = (int) sensor.Key.X + Math.Abs((int) sensor.Key.Y - y) - sensor.Value - 1;
+                xLeft = Math.Max(0, xLeft);
+                int xRight = (int) sensor.Key.X + ((int) sensor.Key.X - xLeft);
+                xRight = Math.Min(yLine, xRight);
+                Vector2[] possibleBeaconPos = { new Vector2(xLeft, y), new Vector2(xRight, y) };
 
-        foreach(Vector2 v in possibleBeaconPos)
-        {
-            bool found = true;
-            foreach(KeyValuePair<Vector2, int> otherSensors in sensors) 
-            {
-                int distanceOfPosToSensor = ManhattanDistance(otherSensors.Key, new Vector2(v.X, v.Y));
-
-                if (distanceOfPosToSensor <= otherSensors.Value)
+                for (int i = 0; i < possibleBeaconPos.Length; i++)
                 {
-                    found = false;
-                    break;
+                    if (FindBeacon(sensors, possibleBeaconPos[i]))
+                    {
+                        long freq = (long) possibleBeaconPos[i].X * (yLine) + (long) possibleBeaconPos[i].Y;
+                        Console.WriteLine($"Task 2: {freq}");
+                        return;
+                    }
                 }
-            }
-
-            if (found)
-            {
-                long freq = (long) v.X * (yLine * 2) + (long) v.Y;
-                Console.WriteLine($"Task 2: {freq}");
-                break;
             }
         }
     }
@@ -104,5 +91,22 @@ internal class Day15
     private static int CoordStringToInt(string coord)
     {
         return int.Parse(coord.Substring(2));
+    }
+
+    private static bool FindBeacon(Dictionary<Vector2, int> sensors, Vector2 possibleBeaconPos)
+    {
+        bool found = true;
+        foreach(KeyValuePair<Vector2, int> sensor in sensors) 
+        {
+            int distanceOfPosToSensor = ManhattanDistance(sensor.Key, possibleBeaconPos);
+
+            if (distanceOfPosToSensor <= sensor.Value)
+            {
+                found = false;
+                break;
+            }
+        }
+
+        return found;
     }
 }
