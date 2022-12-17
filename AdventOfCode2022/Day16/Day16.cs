@@ -29,7 +29,7 @@ internal class Day16
             {
                 if (from.Key == to.Key || to.Value.FlowRate == 0 || from.Value.FlowRate == 0 && from.Key != "AA")
                     continue;
-                paths.Add(from.Key + " " + to.Key, ShortestPath(valvesMap, from.Value, to.Value););
+                paths.Add(from.Key + " " + to.Key, ShortestPath(valvesMap, from.Value, to.Value));
             }
         }
 
