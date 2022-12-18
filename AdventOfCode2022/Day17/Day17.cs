@@ -21,38 +21,32 @@ internal class Day17
         shapes.Add(shape4);
         shapes.Add(shape5);
 
-        (int height, _, _) = PlayTetris(jetPattern, shapes, 2022);
+        (int height, _) = PlayTetris(jetPattern, shapes, 2022);
 
         Console.WriteLine($"Task 1: {height}");
 
-        (_, List<Pattern> patterns, int cycleIdx) = PlayTetris(jetPattern, shapes, 15000);
+        (_, List<Pattern> patterns) = PlayTetris(jetPattern, shapes, 15000);
 
-    //    var aaaaa = FindPattern(patterns);
+        (int start, int rocksPlayedCycle) = FindPattern(patterns);
 
         long elefantRockStops = 1000000000000L;
 
-        int heightBeforePattern = patterns.Take(cycleIdx).Select(p => p.HeightDiff).Sum();
-        int heightPattern = patterns.Skip(cycleIdx).Select(p => p.HeightDiff).Sum();
-        int rocksPlayedCycle = patterns.Skip(cycleIdx).Count();
-        int rocksPlayedBeforeCycle = patterns.Take(cycleIdx).Count();
+        int heightBeforePattern = patterns.Take(start).Select(p => p.HeightDiff).Sum();
+        int heightPattern = patterns.Skip(start).Take(rocksPlayedCycle).Select(p => p.HeightDiff).Sum();
 
-        elefantRockStops -= rocksPlayedBeforeCycle;
+        elefantRockStops -= (start - 1);
         long remaining = elefantRockStops % rocksPlayedCycle;
-        long abc = elefantRockStops / rocksPlayedCycle;
+        long fullPatternMultiplier = elefantRockStops / rocksPlayedCycle;
+        long remainingPatternHeight = patterns.Skip(start).Take((int)remaining - 1).Select(p => p.HeightDiff).Sum();
 
-        long asdf = patterns.Skip(cycleIdx).Take((int)remaining).Select(p => p.HeightDiff).Sum();
-
-        long result = heightBeforePattern + heightPattern * abc + asdf;
+        long result = heightBeforePattern + heightPattern * fullPatternMultiplier + remainingPatternHeight;
         Console.WriteLine($"Task 2: {result}");
     }
 
-    private static (int height, List<Pattern> patterns, int cycleIdx) PlayTetris(string jetPattern, List<int[,]> shapes, int loopCount)
+    private static (int height, List<Pattern> patterns) PlayTetris(string jetPattern, List<int[,]> shapes, int loopCount)
     {
         HashSet<Vector2> chamber = new HashSet<Vector2>();
         List<Pattern> patterns = new List<Pattern>();
-        patterns.Add(new Pattern(0, 0, 0));
-        int cycleIdx = 0;
-        bool cycleFound = false;
         int currentHeight = 0;
         int jetIdx = 0;
         int shapeIdx = 0;
@@ -94,26 +88,14 @@ internal class Day17
                 jetIdx = (jetIdx + 1) % jetPattern.Length;
             }
 
-        //    PrintChamber(chamber);
-
             int newHeight = (int) chamber.Select(v => v.Y).Max() + 1;
-            //patterns.Add(new Pattern(newHeight - currentHeight, jetIdx, shapeIdx));
-            
-            if (!cycleFound && patterns.FindIndex(p => p.HeightDiff == newHeight - currentHeight && p.JetIdx == jetIdx && p.ShapeIdx == shapeIdx) < 0)
-            {
-                patterns.Add(new Pattern(newHeight - currentHeight, jetIdx, shapeIdx));
-            }
-            else if (!cycleFound)
-            {
-                cycleFound = true;
-                cycleIdx = patterns.FindIndex(p => p.HeightDiff == newHeight - currentHeight && p.JetIdx == jetIdx && p.ShapeIdx == shapeIdx);
-            }
+            patterns.Add(new Pattern(newHeight - currentHeight, jetIdx, shapeIdx));
 
             currentHeight = newHeight;
             shapeIdx = (shapeIdx + 1) % shapes.Count;
         }
 
-        return (currentHeight, patterns, cycleIdx);
+        return (currentHeight, patterns);
     }
 
     private static bool HasCollision(HashSet<Vector2> chamber, int[,] shape, Vector2 nextPos)
@@ -139,36 +121,37 @@ internal class Day17
         return false;
     }
 
-    /*
-    private static int FindPattern(List<Pattern> patterns, int minLength = 10)
+    private static (int start, int length) FindPattern(List<Pattern> patterns, int minLength = 10)
     {
-        for(int i = 0; i < patterns.Count - 2 * minLength; i++)
+        for (int start = 0; start < patterns.Count; start++)
         {
-            bool patternFound = true;
-            for (int j = 0; j <= patterns.Count; j++)
+            for (int length = 500; length < (patterns.Count - start) / 2; length++)
             {
-                if (i == 14)
-                {
+                if (start == 181 && length == 1740)
                     Console.Write("");
+
+                bool cycleFound = true;
+                for (int i = 0; i < length; i++)
+                {
+                    Pattern p1 = patterns[start + i];
+                    Pattern p2 = patterns[start + i + length];
+
+                    if (p1.HeightDiff != p2.HeightDiff)
+                    {
+                        cycleFound = false;
+                        break;
+                    }
                 }
 
-                Pattern p1 = patterns[i + j];
-                Pattern p2 = patterns[i + j + minLength];
-
-                if (p1.HeightDiff != p2.HeightDiff)
+                if (cycleFound)
                 {
-                    patternFound = false;
-                    break;
+                    return (start, length);
                 }
             }
-
-            if (patternFound)
-                return i;
         }
 
-        return -1;
+        return (0, 0);
     }
-    */
 
     private static void PrintChamber(HashSet<Vector2> chamber)
     {
@@ -199,11 +182,6 @@ internal class Day17
             HeightDiff = heightDiff;
             JetIdx = jetIdx;
             ShapeIdx = shapeIdx;
-        }
-
-        public int Score()
-        {
-            return HeightDiff + JetIdx + ShapeIdx;
         }
     }
 }
