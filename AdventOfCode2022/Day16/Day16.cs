@@ -4,7 +4,7 @@ namespace AdventOfCode2022.Day16;
 internal class Day16
 {
     const string inputPath = @"Day16/Input.txt";
-    public static void Task1()
+    public static void Task1and2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         string pattern = @"Valve (\w\w) has flow rate=(\d+); tunnels? leads? to valves? (.*)";
