@@ -25,28 +25,28 @@ internal class Day17
 
         Console.WriteLine($"Task 1: {height}");
 
-        (_, List<Pattern> patterns) = PlayTetris(jetPattern, shapes, 15000);
+        (_, List<int> heightDiffs) = PlayTetris(jetPattern, shapes, 15000);
 
-        (int start, int rocksPlayedCycle) = FindPattern(patterns);
+        (int start, int rocksPlayedCycle) = FindPattern(heightDiffs);
 
         long elefantRockStops = 1000000000000L;
 
-        int heightBeforePattern = patterns.Take(start).Select(p => p.HeightDiff).Sum();
-        int heightPattern = patterns.Skip(start).Take(rocksPlayedCycle).Select(p => p.HeightDiff).Sum();
+        int heightBeforePattern = heightDiffs.Take(start).Sum();
+        int heightPattern = heightDiffs.Skip(start).Take(rocksPlayedCycle).Sum();
 
         elefantRockStops -= (start - 1);
         long remaining = elefantRockStops % rocksPlayedCycle;
         long fullPatternMultiplier = elefantRockStops / rocksPlayedCycle;
-        long remainingPatternHeight = patterns.Skip(start).Take((int)remaining - 1).Select(p => p.HeightDiff).Sum();
+        long remainingPatternHeight = heightDiffs.Skip(start).Take((int)remaining - 1).Sum();
 
         long result = heightBeforePattern + heightPattern * fullPatternMultiplier + remainingPatternHeight;
         Console.WriteLine($"Task 2: {result}");
     }
 
-    private static (int height, List<Pattern> patterns) PlayTetris(string jetPattern, List<int[,]> shapes, int loopCount)
+    private static (int height, List<int> heightDiffs) PlayTetris(string jetPattern, List<int[,]> shapes, int loopCount)
     {
         HashSet<Vector2> chamber = new HashSet<Vector2>();
-        List<Pattern> patterns = new List<Pattern>();
+        List<int> heightDiffs = new List<int>();
         int currentHeight = 0;
         int jetIdx = 0;
         int shapeIdx = 0;
@@ -89,13 +89,13 @@ internal class Day17
             }
 
             int newHeight = (int) chamber.Select(v => v.Y).Max() + 1;
-            patterns.Add(new Pattern(newHeight - currentHeight, jetIdx, shapeIdx));
+            heightDiffs.Add(newHeight - currentHeight);
 
             currentHeight = newHeight;
             shapeIdx = (shapeIdx + 1) % shapes.Count;
         }
 
-        return (currentHeight, patterns);
+        return (currentHeight, heightDiffs);
     }
 
     private static bool HasCollision(HashSet<Vector2> chamber, int[,] shape, Vector2 nextPos)
@@ -121,11 +121,11 @@ internal class Day17
         return false;
     }
 
-    private static (int start, int length) FindPattern(List<Pattern> patterns, int minLength = 10)
+    private static (int start, int length) FindPattern(List<int> heightDiffs, int minLength = 10)
     {
-        for (int start = 0; start < patterns.Count; start++)
+        for (int start = 0; start < heightDiffs.Count; start++)
         {
-            for (int length = 500; length < (patterns.Count - start) / 2; length++)
+            for (int length = 500; length < (heightDiffs.Count - start) / 2; length++)
             {
                 if (start == 181 && length == 1740)
                     Console.Write("");
@@ -133,10 +133,10 @@ internal class Day17
                 bool cycleFound = true;
                 for (int i = 0; i < length; i++)
                 {
-                    Pattern p1 = patterns[start + i];
-                    Pattern p2 = patterns[start + i + length];
+                    int hd1 = heightDiffs[start + i];
+                    int hd2 = heightDiffs[start + i + length];
 
-                    if (p1.HeightDiff != p2.HeightDiff)
+                    if (hd1 != hd2)
                     {
                         cycleFound = false;
                         break;
@@ -169,19 +169,5 @@ internal class Day17
         }
 
         Console.WriteLine("\n");
-    }
-
-    private class Pattern
-    {
-        public int HeightDiff { get; set; }
-        public int JetIdx { get; set; }
-        public int ShapeIdx { get; set; }
-
-        public Pattern(int heightDiff, int jetIdx, int shapeIdx)
-        {
-            HeightDiff = heightDiff;
-            JetIdx = jetIdx;
-            ShapeIdx = shapeIdx;
-        }
     }
 }
