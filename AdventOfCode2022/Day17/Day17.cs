@@ -5,7 +5,7 @@ internal class Day17
 {
     const string inputPath = @"Day17/Input.txt";
 
-    public static void Task1()
+    public static void Task1and2()
     {
         string jetPattern = File.ReadAllLines(inputPath).First();
         int[,] shape1 = new int[4,1] { { 1 }, { 1 }, { 1 }, { 1 } };
