@@ -93,6 +93,10 @@ class Program
             case 19:
                 Day19.Day19.Task1and2();
                 break;
+            case 20:
+                Day20.Day20.Task1();
+                Day20.Day20.Task2();
+                break;
             default:
                 break;
         }
