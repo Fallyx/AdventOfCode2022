@@ -39,7 +39,7 @@ internal class Day19
 
     private static int HighestGeode(Vector4[] robotCost, int maxMins)
     {
-        int maxGeode = 0;
+        int[] maxGeodes = new int[maxMins + 1];
         int maxOreBots = (int) robotCost.Select(v => v.X).Max();
         int maxClayBots = (int) robotCost.Select(v => v.Y).Max();
         int maxObsidianBots = (int) robotCost.Select(v => v.Z).Max();
@@ -55,8 +55,11 @@ internal class Day19
             if (!visited.Add((currentStep.resources, currentStep.robots)))
                 continue;
 
+            if (maxGeodes[currentStep.minute] > (int) currentStep.resources.W)
+                continue;
+
             Vector4 collected = currentStep.robots;
-            maxGeode = Math.Max(maxGeode, (int) currentStep.resources.W);
+            maxGeodes[currentStep.minute] = Math.Max(maxGeodes[currentStep.minute], (int) currentStep.resources.W);
             // Create geode bot if possible and skip other routes
             if (currentStep.minute + 1 <= maxMins && currentStep.resources.X >= robotCost[3].X && currentStep.resources.Z >= robotCost[3].Z)
             {
@@ -99,7 +102,7 @@ internal class Day19
                 queue.Enqueue((currentStep.resources + collected, currentStep.robots, currentStep.minute + 1));
         }
 
-        return maxGeode;
+        return maxGeodes[maxMins];
     }
 
     private static Vector4[] ParseRobotCost(Match m)

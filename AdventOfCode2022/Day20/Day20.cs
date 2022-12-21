@@ -64,7 +64,6 @@ internal class Day20
         {
             current.Left.Right = current.Right;
             current.Right.Left = current.Left;
-
             long steps = Math.Abs(current.Number) % (doubleLinkedList.Count - 1);
 
             if (current.Number < 0)
@@ -79,9 +78,11 @@ internal class Day20
         Node findNumber = doubleLinkedList.First(n => n.Number == 0); 
         long sumNumbers = 0;
 
+        int steps = 1000 % doubleLinkedList.Count;
+
         for (int i = 1; i <= 3; i++)
         {
-            for (int m = 0; m < 1000; m++)
+            for (int m = 0; m < steps; m++)
             {
                 findNumber = findNumber.Right;
             }
