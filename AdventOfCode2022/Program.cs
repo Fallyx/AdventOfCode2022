@@ -101,7 +101,7 @@ class Program
                 Day21.Day21.Task1and2();
                 break;
             case 22:
-                Day22.Day22.Task1();
+                Day22.Day22.Task1and2();
                 break;
             default:
                 break;
