@@ -5,7 +5,7 @@ namespace AdventOfCode2022.Day23;
 internal class Day23
 {
     const string inputPath = @"Day23/Input.txt";
-    public static void Task1()
+    public static void Task1and2()
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         HashSet<Vector2> elves = new HashSet<Vector2>();
