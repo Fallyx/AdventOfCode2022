@@ -25,28 +25,46 @@ internal class Day24
             }
         }
 
-        Console.WriteLine($"Task 1: {ShortestPath(map, blizzards)}");
+        Vector2 target = new Vector2();
+        target.X = map.Max(m => m.X);
+        target.Y = map.Max(m => m.Y);
+
+        Vector2 start = new Vector2(1, 0);
+
+        Console.WriteLine($"Task 1: {ShortestPath(map, blizzards, start, target).Item1}");
+
+        int sumMins = 0;
+
+        List<Blizzard> bs = blizzards;
+        for (int i = 0; i < 3; i++)
+        {
+            int mins = 0;
+            if (i % 2 == 0)
+                (mins, bs) = ShortestPath(map, bs, start, target);
+            else
+                (mins, bs) = ShortestPath(map, bs, target, start);
+            sumMins += mins;
+        }
+
+        Console.WriteLine($"Task 2: {sumMins}");
     }
 
-    private static int ShortestPath(HashSet<Vector2> map, List<Blizzard> blizzards)
+    private static (int, List<Blizzard>) ShortestPath(HashSet<Vector2> map, List<Blizzard> blizzards, Vector2 start, Vector2 target)
     {
         Queue<(Vector2 elfPos, int minute)> queue = new Queue<(Vector2 elfPos, int minute)>();
         HashSet<(Vector2 elfPos, int min)> visited = new HashSet<(Vector2 elfPos, int min)>();
         Dictionary<int, List<Blizzard>> blizzardStates = new Dictionary<int, List<Blizzard>>();
         Vector2[] moves = new Vector2[5] { new Vector2(0, -1), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(1, 0), Vector2.Zero };
-        Vector2 target = new Vector2();
-        target.X = map.Max(m => m.X);
-        target.Y = map.Max(m => m.Y);
 
         blizzardStates.Add(0, blizzards);
-        queue.Enqueue((new Vector2(1, 0), 0));
+        queue.Enqueue((start, 0));
 
         while(queue.Count > 0)
         {
             (Vector2 elfPos, int minute) = queue.Dequeue();
 
             if (elfPos == target)
-                return minute;
+                return (minute, blizzardStates[minute]);
                 
             List<Blizzard> bs;
             if (blizzardStates.ContainsKey(minute + 1))
@@ -69,7 +87,7 @@ internal class Day24
             }
         }
 
-        return int.MaxValue;
+        return (int.MaxValue, new List<Blizzard>());
     }
 
     private static void NextMove(HashSet<Vector2> map, List<Blizzard> blizzards, HashSet<(Vector2 elfPos, int min)> visited, Vector2 elfPos, int minute)
