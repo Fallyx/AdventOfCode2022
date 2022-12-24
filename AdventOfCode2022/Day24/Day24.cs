@@ -9,7 +9,7 @@ internal class Day24
     {
         List<string> lines = File.ReadAllLines(inputPath).ToList();
         HashSet<Vector2> map = new HashSet<Vector2>();
-        List<Blizzard> blizzards = new List<Blizzard>();
+        Dictionary<Vector2, List<Blizzard>> blizzards = new Dictionary<Vector2, List<Blizzard>>();
 
         for(int y = 0; y < lines.Count; y++)
         {
@@ -21,21 +21,26 @@ internal class Day24
                 map.Add(new Vector2(x, y));
 
                 if (lines[y][x] != '.')
-                    blizzards.Add(new Blizzard(x, y, lines[y][x]));
+                {
+                    Vector2 pos = new Vector2(x, y);
+                    if (!blizzards.ContainsKey(pos))
+                        blizzards.Add(pos, new List<Blizzard>());
+                        
+                    blizzards[pos].Add(new Blizzard(lines[y][x])); 
+                }
+                    
             }
         }
 
+        Vector2 start = new Vector2(1, 0);
         Vector2 target = new Vector2();
         target.X = map.Max(m => m.X);
         target.Y = map.Max(m => m.Y);
 
-        Vector2 start = new Vector2(1, 0);
-
         Console.WriteLine($"Task 1: {ShortestPath(map, blizzards, start, target).Item1}");
 
         int sumMins = 0;
-
-        List<Blizzard> bs = blizzards;
+        Dictionary<Vector2, List<Blizzard>> bs = blizzards;
         for (int i = 0; i < 3; i++)
         {
             int mins = 0;
@@ -49,11 +54,11 @@ internal class Day24
         Console.WriteLine($"Task 2: {sumMins}");
     }
 
-    private static (int, List<Blizzard>) ShortestPath(HashSet<Vector2> map, List<Blizzard> blizzards, Vector2 start, Vector2 target)
+    private static (int, Dictionary<Vector2, List<Blizzard>>) ShortestPath(HashSet<Vector2> map, Dictionary<Vector2, List<Blizzard>> blizzards, Vector2 start, Vector2 target)
     {
         Queue<(Vector2 elfPos, int minute)> queue = new Queue<(Vector2 elfPos, int minute)>();
         HashSet<(Vector2 elfPos, int min)> visited = new HashSet<(Vector2 elfPos, int min)>();
-        Dictionary<int, List<Blizzard>> blizzardStates = new Dictionary<int, List<Blizzard>>();
+        Dictionary<int, Dictionary<Vector2, List<Blizzard>>> blizzardStates = new Dictionary<int, Dictionary<Vector2, List<Blizzard>>>();
         Vector2[] moves = new Vector2[5] { new Vector2(0, -1), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(1, 0), Vector2.Zero };
 
         blizzardStates.Add(0, blizzards);
@@ -66,7 +71,7 @@ internal class Day24
             if (elfPos == target)
                 return (minute, blizzardStates[minute]);
                 
-            List<Blizzard> bs;
+            Dictionary<Vector2, List<Blizzard>> bs;
             if (blizzardStates.ContainsKey(minute + 1))
                 bs = blizzardStates[minute + 1];
             else
@@ -80,35 +85,19 @@ internal class Day24
                 Vector2 elfNextPos = elfPos + moves[i];
                 if (!map.Contains(elfNextPos))
                     continue;
-                if (bs.Any(b => b.Position.X == elfNextPos.X && b.Position.Y == elfNextPos.Y))
+                if (bs.ContainsKey(elfNextPos))
                     continue;
                 if (visited.Add((elfNextPos, minute + 1)))
                     queue.Enqueue((elfNextPos, minute + 1));
             }
         }
 
-        return (int.MaxValue, new List<Blizzard>());
+        return (int.MaxValue, new Dictionary<Vector2, List<Blizzard>>());
     }
 
-    private static void NextMove(HashSet<Vector2> map, List<Blizzard> blizzards, HashSet<(Vector2 elfPos, int min)> visited, Vector2 elfPos, int minute)
+    private static Vector2 WrapPos(HashSet<Vector2> map, Blizzard blizzard, Vector2 blizzardPos)
     {
-        Vector2[] moves = new Vector2[5] { new Vector2(0, -1), new Vector2(0, 1), new Vector2(-1, 0), new Vector2(1, 0), Vector2.Zero };
-
-        for (int i = 0; i < moves.Length; i++)
-        {
-            Vector2 elfNextPos = elfPos + moves[i];
-
-            if (!map.Contains(elfNextPos))
-                continue;
-            if (blizzards.Any(b => b.Position.X == elfNextPos.X && b.Position.Y == elfNextPos.Y))
-                continue;
-            
-        }
-    }
-
-    private static Vector2 WrapPos(HashSet<Vector2> map, Blizzard blizzard)
-    {
-        Vector2 nextPos = new Vector2(blizzard.Position.X, blizzard.Position.Y);
+        Vector2 nextPos = blizzardPos;
 
         if (blizzard.Dir == Blizzard.Direction.Up)
             nextPos.Y = map.Max(m => m.Y) - 1;
@@ -122,25 +111,30 @@ internal class Day24
         return nextPos;
     }
 
-    private static List<Blizzard> GenerateBlizzardState(HashSet<Vector2> map, List<Blizzard> blizzards)
+    private static Dictionary<Vector2, List<Blizzard>> GenerateBlizzardState(HashSet<Vector2> map, Dictionary<Vector2, List<Blizzard>> blizzards)
     {
-        List<Blizzard> newBs = new List<Blizzard>();
-        foreach (Blizzard b in blizzards)
+        Dictionary<Vector2, List<Blizzard>> newBs = new Dictionary<Vector2, List<Blizzard>>();
+        foreach (KeyValuePair<Vector2, List<Blizzard>> entry in blizzards)
         {
-            Blizzard newB = new Blizzard((int) b.Position.X, (int) b.Position.Y, b.Character);
-            Vector2 nextPos = newB.NextPos();
-            if (map.Contains(nextPos))
-                newB.Position = nextPos;
-            else
-                newB.Position = WrapPos(map, newB);
+            foreach(Blizzard b in entry.Value)
+            {
+                Blizzard newB = new Blizzard(b.Character);
+                Vector2 newPos = entry.Key + newB.NextPos();
 
-            newBs.Add(newB);
+                if(!map.Contains(newPos))
+                    newPos = WrapPos(map, b, entry.Key);
+
+                if (!newBs.ContainsKey(newPos))
+                    newBs.Add(newPos, new List<Blizzard>());
+
+                newBs[newPos].Add(newB);
+            }
         }
 
         return newBs;
     }
 
-    private static void PrintMap(HashSet<Vector2> map, List<Blizzard> blizzards)
+    private static void PrintMap(HashSet<Vector2> map, Dictionary<Vector2, List<Blizzard>> blizzards)
     {
         int minX = (int) map.Min(v => v.X) - 1;
         int maxX = (int) map.Max(v => v.X) + 1;
@@ -151,12 +145,13 @@ internal class Day24
         {
             for (int x = minX; x <= maxX; x++)
             {
-                List<Blizzard> bs = blizzards.Where(b => b.Position.X == x && b.Position.Y == y).ToList();
+                Vector2 pos = new Vector2(x, y);
+                List<Blizzard> bs = blizzards[pos];
                 if (bs.Count == 1)
                     Console.Write(bs.First().Character);
                 else if (bs.Count > 1)
                     Console.Write(bs.Count);
-                else if (map.Contains(new Vector2(x, y)))
+                else if (map.Contains(pos))
                     Console.Write('.');
                 else
                     Console.Write('#');
@@ -177,13 +172,11 @@ internal class Day24
             Right
         };
 
-        public Vector2 Position { get; set; }
         public Direction Dir { get; set; }
         public char Character { get; set; }
 
-        public Blizzard(int x, int y, char c)
+        public Blizzard(char c)
         {
-            Position = new Vector2(x, y);
             Character = c;
             if (c == '^')
                 Dir = Direction.Up;
@@ -198,13 +191,13 @@ internal class Day24
         public Vector2 NextPos()
         {
             if (Dir == Direction.Up)
-                return Position + new Vector2(0, -1);
+                return new Vector2(0, -1);
             else if (Dir == Direction.Down)
-                return Position + new Vector2(0, 1);
+                return new Vector2(0, 1);
             else if (Dir == Direction.Left)
-                return Position + new Vector2(-1 , 0);
+                return new Vector2(-1 , 0);
             else
-                return Position + new Vector2(1, 0);
+                return new Vector2(1, 0);
         }
     }
 }
